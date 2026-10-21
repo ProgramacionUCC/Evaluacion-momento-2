@@ -2,10 +2,15 @@ package evaluacionMomento2.evaluacion2.entity;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("CLIENTE")
@@ -16,6 +21,11 @@ import lombok.experimental.SuperBuilder;
 public class Cliente extends Usuario {
 
     private Integer puntosFidelidad;
+
+    // Un cliente puede tener muchas solicitudes
+    @OneToMany(mappedBy = "cliente")
+    @Builder.Default
+    private List<Solicitud> solicitudes = new ArrayList<>();
 
     public Cliente(Long id, String nombre, String correo, Integer puntosFidelidad) {
         super(id, nombre, correo);
