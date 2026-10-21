@@ -1,0 +1,132 @@
+{
+  "info": {
+    "name": "Evaluacion 2 - Usuarios y Solicitudes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Usuarios",
+      "item": [
+        {
+          "name": "Crear administrador",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"tipoUsuario\":\"ADMINISTRADOR\",\"nombre\":\"Ana Gómez\",\"correo\":\"ana@mail.com\",\"nivelAcceso\":3}" },
+            "url": "http://localhost:8080/usuarios"
+          }
+        },
+        {
+          "name": "Crear empleado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"tipoUsuario\":\"EMPLEADO\",\"nombre\":\"Luis Pérez\",\"correo\":\"luis@mail.com\",\"cargo\":\"Soporte técnico\",\"salario\":2500000}" },
+            "url": "http://localhost:8080/usuarios"
+          }
+        },
+        {
+          "name": "Crear cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"tipoUsuario\":\"CLIENTE\",\"nombre\":\"Sara Ruiz\",\"correo\":\"sara@mail.com\",\"puntosFidelidad\":10}" },
+            "url": "http://localhost:8080/usuarios"
+          }
+        },
+        {
+          "name": "Error 400 - nivelAcceso fuera de rango",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"tipoUsuario\":\"ADMINISTRADOR\",\"nombre\":\"Pedro\",\"correo\":\"pedro@mail.com\",\"nivelAcceso\":9}" },
+            "url": "http://localhost:8080/usuarios"
+          }
+        },
+        {
+          "name": "Error 400 - salario negativo",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"tipoUsuario\":\"EMPLEADO\",\"nombre\":\"Marta\",\"correo\":\"marta@mail.com\",\"cargo\":\"Ventas\",\"salario\":-5}" },
+            "url": "http://localhost:8080/usuarios"
+          }
+        },
+        {
+          "name": "Error 400 - correo invalido y nombre vacio",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"tipoUsuario\":\"CLIENTE\",\"nombre\":\"\",\"correo\":\"sin-arroba\"}" },
+            "url": "http://localhost:8080/usuarios"
+          }
+        },
+        {
+          "name": "Listar usuarios (paginado)",
+          "request": { "method": "GET", "url": "http://localhost:8080/usuarios?pagina=0&tamano=5&ordenarPor=nombre&direccion=asc" }
+        },
+        {
+          "name": "Buscar usuario por id",
+          "request": { "method": "GET", "url": "http://localhost:8080/usuarios/1" }
+        },
+        {
+          "name": "Error 404 - usuario inexistente",
+          "request": { "method": "GET", "url": "http://localhost:8080/usuarios/999" }
+        }
+      ]
+    },
+    {
+      "name": "Solicitudes",
+      "item": [
+        {
+          "name": "Crear solicitud con empleado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"descripcion\":\"No puedo ingresar a mi cuenta\",\"clienteId\":3,\"empleadoId\":2}" },
+            "url": "http://localhost:8080/solicitudes"
+          }
+        },
+        {
+          "name": "Crear solicitud sin empleado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"descripcion\":\"Quiero cambiar mi plan\",\"clienteId\":3}" },
+            "url": "http://localhost:8080/solicitudes"
+          }
+        },
+        {
+          "name": "Error 404 - cliente inexistente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"descripcion\":\"Prueba\",\"clienteId\":999}" },
+            "url": "http://localhost:8080/solicitudes"
+          }
+        },
+        {
+          "name": "Listar solicitudes (filtro por estado)",
+          "request": { "method": "GET", "url": "http://localhost:8080/solicitudes?estado=PENDIENTE&ordenarPor=fechaCreacion&direccion=desc" }
+        },
+        {
+          "name": "Buscar solicitud por id",
+          "request": { "method": "GET", "url": "http://localhost:8080/solicitudes/1" }
+        }
+      ]
+    },
+    {
+      "name": "Gestor (lista, cola y pila)",
+      "item": [
+        { "name": "Ver cola", "request": { "method": "GET", "url": "http://localhost:8080/solicitudes/cola" } },
+        { "name": "Procesar siguiente", "request": { "method": "POST", "url": "http://localhost:8080/solicitudes/procesar" } },
+        { "name": "Ver historial", "request": { "method": "GET", "url": "http://localhost:8080/solicitudes/historial" } },
+        { "name": "Deshacer ultimo", "request": { "method": "POST", "url": "http://localhost:8080/solicitudes/deshacer" } },
+        { "name": "Procesar todas", "request": { "method": "POST", "url": "http://localhost:8080/solicitudes/procesar-todas" } },
+        { "name": "Buscar por texto", "request": { "method": "GET", "url": "http://localhost:8080/solicitudes/buscar?texto=cuenta" } },
+        { "name": "Ordenar por fecha", "request": { "method": "GET", "url": "http://localhost:8080/solicitudes/ordenadas?criterio=fecha" } },
+        { "name": "Busqueda binaria por id", "request": { "method": "GET", "url": "http://localhost:8080/solicitudes/memoria/2" } }
+      ]
+    }
+  ]
+}
