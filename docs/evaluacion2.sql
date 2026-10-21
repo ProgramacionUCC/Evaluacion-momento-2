@@ -12,7 +12,7 @@ CREATE TABLE usuarios (
 
     nivel_acceso INT NULL,
     cargo VARCHAR(100) NULL,
-    salario DECIMAL(10, 2) NULL,
+    salario DOUBLE NULL,
     puntos_fidelidad INT NULL,
 
     CONSTRAINT chk_nivel_acceso

@@ -1,25 +1,31 @@
 package evaluacionMomento2.evaluacion2.entity;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "empleados")
-@Setter
+@DiscriminatorValue("EMPLEADO")
 @Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @SuperBuilder
 public class Empleado extends Usuario {
+
+    @NotBlank(message = "El cargo es obligatorio")
     private String cargo;
+
+    @NotNull(message = "El salario es obligatorio")
+    @Positive(message = "El salario debe ser mayor que cero")
     private Double salario;
 
-    public Empleado(Integer id, String nombre, String correo, String cargo, Double salario) {
+    public Empleado(Long id, String nombre, String correo, String cargo, Double salario) {
         super(id, nombre, correo);
         this.cargo = cargo;
         this.salario = salario;
