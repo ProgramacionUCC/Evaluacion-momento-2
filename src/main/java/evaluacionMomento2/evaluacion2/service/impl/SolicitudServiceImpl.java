@@ -12,6 +12,7 @@ import evaluacionMomento2.evaluacion2.exception.ReglaNegocioException;
 import evaluacionMomento2.evaluacion2.repository.ClienteRepository;
 import evaluacionMomento2.evaluacion2.repository.EmpleadoRepository;
 import evaluacionMomento2.evaluacion2.repository.SolicitudRepository;
+import evaluacionMomento2.evaluacion2.service.GestorSolicitudes;
 import evaluacionMomento2.evaluacion2.service.SolicitudService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ public class SolicitudServiceImpl implements SolicitudService {
     private final SolicitudRepository solicitudRepository;
     private final ClienteRepository clienteRepository;
     private final EmpleadoRepository empleadoRepository;
+    private final GestorSolicitudes gestor;
 
     @Override
     @Transactional
@@ -51,7 +53,9 @@ public class SolicitudServiceImpl implements SolicitudService {
                 .empleado(empleado)
                 .build();
 
-        return convertir(solicitudRepository.save(solicitud));
+        Solicitud guardada = solicitudRepository.save(solicitud);
+        gestor.agregar(guardada);
+        return convertir(guardada);
     }
 
     @Override
@@ -87,6 +91,68 @@ public class SolicitudServiceImpl implements SolicitudService {
         return solicitudRepository.findById(id)
                 .map(this::convertir)
                 .orElseThrow(() -> new RecursoNoEncontradoException("No existe una solicitud con id " + id));
+    }
+
+    @Override
+    public List<SolicitudResponseDTO> verCola() {
+        return convertirLista(gestor.verCola());
+    }
+
+    @Override
+    public List<SolicitudResponseDTO> verHistorial() {
+        return convertirLista(gestor.verHistorial());
+    }
+
+    // Lo que el gestor marca como resuelta (o pendiente al deshacer) tambien se guarda en la base de datos
+    @Override
+    @Transactional
+    public SolicitudResponseDTO procesarSiguiente() {
+        Solicitud solicitud = gestor.procesarSiguiente();
+        solicitudRepository.save(solicitud);
+        return convertir(solicitud);
+    }
+
+    @Override
+    @Transactional
+    public List<SolicitudResponseDTO> procesarTodas() {
+        List<Solicitud> procesadas = gestor.procesarTodas();
+        solicitudRepository.saveAll(procesadas);
+        return convertirLista(procesadas);
+    }
+
+    @Override
+    @Transactional
+    public SolicitudResponseDTO deshacerUltimo() {
+        Solicitud solicitud = gestor.deshacerUltimo();
+        solicitudRepository.save(solicitud);
+        return convertir(solicitud);
+    }
+
+    @Override
+    public List<SolicitudResponseDTO> buscarPorTexto(String texto) {
+        return convertirLista(gestor.buscarPorTexto(texto));
+    }
+
+    @Override
+    public SolicitudResponseDTO buscarEnMemoria(Long id) {
+        Solicitud solicitud = gestor.buscarPorId(id);
+        if (solicitud == null) {
+            throw new RecursoNoEncontradoException("No existe una solicitud con id " + id + " en memoria");
+        }
+        return convertir(solicitud);
+    }
+
+    @Override
+    public List<SolicitudResponseDTO> ordenar(String criterio) {
+        return convertirLista(gestor.ordenar(criterio));
+    }
+
+    private List<SolicitudResponseDTO> convertirLista(List<Solicitud> solicitudes) {
+        List<SolicitudResponseDTO> respuesta = new ArrayList<>();
+        for (Solicitud solicitud : solicitudes) {
+            respuesta.add(convertir(solicitud));
+        }
+        return respuesta;
     }
 
     private PageRequest crearPaginacion(int pagina, int tamano, String ordenarPor, String direccion) {
