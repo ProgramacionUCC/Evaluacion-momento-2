@@ -3,6 +3,7 @@ package evaluacionMomento2.evaluacion2.entity;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 @SuperBuilder
 public class Cliente extends Usuario {
 
+    @Min(value = 0, message = "Los puntos de fidelidad no pueden ser negativos")
     private Integer puntosFidelidad;
 
     // Un cliente puede tener muchas solicitudes
